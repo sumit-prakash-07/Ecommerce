@@ -18,6 +18,7 @@ function AuthRegister() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  
   function onSubmit(event) {
     event.preventDefault();
     dispatch(registerUser(formData)).then((data) => {
@@ -31,11 +32,10 @@ function AuthRegister() {
           title: data?.payload?.message,
           variant: "destructive",
         });
+        console.log(data?.payload?.message)
       }
     });
   }
-
-  console.log(formData);
 
   return (
     <div className="mx-auto w-full max-w-md space-y-6">
