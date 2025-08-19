@@ -1,9 +1,22 @@
-Developed a MERN stack (MongoDB, Express.js, React.js, Node.js) eCommerce platform with user authentication and admin dashboard.
+## Low-Level Design
 
-Implemented secure authentication using JWT and bcrypt for password hashing.
+### User Authentication Flow
 
-Designed and integrated a responsive UI using React, Tailwind CSS, and Redux for state management.
+This diagram shows the login process for a user.
 
-Built RESTful APIs to handle product listings, orders, payments, and user profiles.
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant Database
 
-Integrated payment gateway (e.g., Paypal) for secure transactions.
+    User->>Frontend: Fills and submits login form
+    Frontend->>Backend: POST /api/auth/login with credentials
+    activate Backend
+    Backend->>Database: Find user by email
+    Database-->>Backend: Return user data
+    Backend->>Backend: Compare hashed password
+    Backend->>Frontend: Return success and JWT cookie
+    deactivate Backend
+    Frontend->>User: Redirects to dashboard/shop
