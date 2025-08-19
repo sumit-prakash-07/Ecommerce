@@ -7,23 +7,27 @@ This diagram shows the login process for a user.
 
 ```mermaid
 sequenceDiagram
-    participant Admin
+    participant Customer
     participant Frontend
-    participant Cloudinary
     participant Backend
     participant Database
 
-    Admin->>Frontend: Fills out "Add Product" form and selects image
-    Frontend->>Cloudinary: Uploads image file
-    activate Cloudinary
-    Cloudinary-->>Frontend: Returns secure image URL
-    deactivate Cloudinary
-    
-    Frontend->>Backend: POST /api/admin/products/add with product data and image URL
+    Customer->>Frontend: Writes and submits a review for a product
+    Frontend->>Backend: POST /api/shop/review/add with product ID, user ID, and review
     activate Backend
-    Backend->>Database: Insert new document into 'products' collection
-    Database-->>Backend: Confirm new product saved
-    Backend-->>Frontend: Return success message and new product data
-    deactivate Backend
+    Backend->>Database: Query 'orders' to verify user purchased the product
+    Database-->>Backend: Return order status
     
-    Frontend->>Admin: Displays "Product added successfully"
+    alt User has purchased the product
+        Backend->>Database: Insert new review into 'reviews' collection
+        Database-->>Backend: Confirm review saved
+        Backend->>Backend: Recalculate average review score for the product
+        Backend->>Database: Update 'products' collection with new average score
+        Database-->>Backend: Confirm product update
+        Backend-->>Frontend: Return success message
+    else User has not purchased the product
+        Backend-->>Frontend: Return error: "You must purchase this product to review it"
+    end
+    deactivate Backend
+
+    Frontend->>Customer: Display confirmation or error message
