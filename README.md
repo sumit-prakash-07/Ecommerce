@@ -7,23 +7,23 @@ This diagram shows the login process for a user.
 
 ```mermaid
 sequenceDiagram
-    participant User
+    participant Admin
     participant Frontend
+    participant Cloudinary
     participant Backend
     participant Database
 
-    User->>Frontend: Fills and submits registration form
-    Frontend->>Backend: POST /api/auth/register with user data
+    Admin->>Frontend: Fills out "Add Product" form and selects image
+    Frontend->>Cloudinary: Uploads image file
+    activate Cloudinary
+    Cloudinary-->>Frontend: Returns secure image URL
+    deactivate Cloudinary
+    
+    Frontend->>Backend: POST /api/admin/products/add with product data and image URL
     activate Backend
-    Backend->>Database: Check if email already exists
-    Database-->>Backend: Return user status
-    alt Email is unique
-        Backend->>Backend: Hash the user's password using bcrypt
-        Backend->>Database: Save new user to 'users' collection
-        Database-->>Backend: Confirm user creation
-        Backend-->>Frontend: Return success message
-    else Email already exists
-        Backend-->>Frontend: Return error: "User already exists"
-    end
+    Backend->>Database: Insert new document into 'products' collection
+    Database-->>Backend: Confirm new product saved
+    Backend-->>Frontend: Return success message and new product data
     deactivate Backend
-    Frontend->>User: Display success or error message
+    
+    Frontend->>Admin: Displays "Product added successfully"
